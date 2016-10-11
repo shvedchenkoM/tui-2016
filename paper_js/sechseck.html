@@ -4,11 +4,30 @@
 <meta charset="utf-8" />
 <script type="text/javascript" src="js/paper-full.min.js"></script>
 <script type="text/javascript" src="js/gamemodel.js"></script>
+<div id="gameParam">
+<p><strong>Введите размеры поля:</strong></p>
+   <p>Columns : <input type="number" min="4" max="40" value="5" id="col"/></p>
+   <p>Rows : <input type="number" min="4" max="40" value="5" id="row"/></p>
+   <p style="text-align: left" ><button id="step2Button">Продолжить</button>
+</div>
+<div id="playersName" style="display: none;">
+     <p><strong>Введите имена игроков:</strong></p>
+        <p>Имя первого : <input type="text" value="player1" id="name1"/></p>
+        <p>Имя второго : <input type="text" value="player2" id="name2"/></p>
+        <p style="text-align: left" ><button id="startButton">Начать игру</button>
+</div>
 
 <script type="text/paperscript" canvas="myCanvas">
 
 var castleProto = document.getElementById('castleProto');
 var townProto = document.getElementById('townProto');
+var row = document.getElementById('row');
+var col = document.getElementById('col');
+var step2Button = document.getElementById('step2Button');
+var startButton = document.getElementById('startButton');
+var gameParam = document.getElementById('gameParam');
+var name1 = document.getElementById('name1');
+var name2 = document.getElementById('name2');
 
 function showTurn(game){
   var path = new Path.Rectangle(10,10,30,30);
@@ -112,6 +131,7 @@ function VCell(center, radius, coords) {
   }
 
 
+
   function handleTurn(coords) {
     if (game.makeTurn(game.getTurn(), coords.r, coords.c)) {
      game.flipTurn();
@@ -121,56 +141,58 @@ function VCell(center, radius, coords) {
       var c1 = game.countOfCells(1);
       var c2 = game.countOfCells(2);
       var a = game.getWinner();
-      if(a !== 'draw')
-      showCongr(a + '-й игрок выиграл!!!' + '( ' + c1 + ':' + c2 + ' )' ); else {
+      if(a !== 'draw'){
+        showCongr('Игрок ' + (['',name1.value,name2.value][a]) + ' выиграл!!!' + '( ' + c1 + ':' + c2 + ' )' );
+      } else {
         showCongr('  (:НИЧЬЯ:)');
       }
+      showGameParam();
     }
   }
 
-  function onMouseDownHandler(event) {
-    segment = item = null;
-    var hitResult = project.hitTest(event.point, hitOptions);
-    if (!hitResult) {
-      return;
-    }
 
-    if (hitResult) {
-      item = hitResult.item;
-      game.makeTurn(game.getTurn(), item._parent.vcell.coords.r, item._parent.vcell.coords.c)
-    }
-
-    game.flipTurn()
-    showTurn(game);
-    if(game.isGameOver()){
-      var c1 = game.countOfCells(1);
-      var c2 = game.countOfCells(2);
-      var a = game.getWinner();
-      if(a !== 'draw')
-      showCongr(a + '-й игрок выиграл!!!' + '( ' + c1 + ':' + c2 + ' )' ); else {
-        showCongr('  (:НИЧЬЯ:)');
-      }
-    }
-  }
 
   function logger(txt) {
     document.getElementById('log').innerHTML += txt + "<br/>"
   }
 
-  var game = new GameModel(8, 18)
+  var game;
 
-  game.makearr()
-  game.setInitPos([
-    [6, 1],
-    [1, 16]
-  ])
+  function startGame(){
+    clearView();
+    hideNamesPanel();
+    var x = row.value;
+    var y = col.value;
+    game = new GameModel(x, y);
+    game.makearr()
+    game.setInitPos([
+      [x-2, 1],
+      [1, y-2]
+    ])
+    drawe(30);
+    showTurn(game);
+  }
 
-
-  drawe(30);
-  showTurn(game);
-
-
-  //game.makeTurn(1,3,3)
+  startButton.addEventListener('click', startGame );
+  step2Button.addEventListener('click', showNamesPanel )
+  function clearView() {
+    project.activeLayer.removeChildren();
+    view.draw();
+  }
+  function hideGameParam() {
+    gameParam.style = "display:none;";
+  }
+  function showGameParam() {
+    gameParam.style = "";
+    hideNamesPanel();
+  }
+  function showNamesPanel() {
+    hideGameParam();
+    playersName.style = "";
+  }
+  function hideNamesPanel() {
+    playersName.style = "display: none;";
+  }
 
 </script>
 </head>
@@ -193,3 +215,4 @@ v32H32V16H0v32v64l32,32v128v224h160v-64c0-35.375,28.656-64,64-64s64,28.625,64,64
 
 </body>
 </html>
+

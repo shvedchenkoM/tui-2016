@@ -160,6 +160,7 @@ GameModel.prototype.isTurnValid = function(player, r, c) {
 GameModel.prototype.isTurnExpanding = function(player, r, c){
   if (!this.isInRange(r, c)) return false;
   if (this.field[r][c].castle) return false;
+  if (this.field[r][c].town) return false;
   if (this.field[r][c].condition === player) {
       for(var i = 0; i<6; i++){
         var k = this.getNeighbor(r, c, i);
