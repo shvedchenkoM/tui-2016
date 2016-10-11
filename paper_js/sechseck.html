@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8" />
+<script type="text/javascript" src="js/paper-full.min.js"></script>
+<script type="text/javascript" src="js/gamemodel.js"></script>
+
+<script type="text/paperscript" canvas="myCanvas">
+
+var castleProto = document.getElementById('castleProto');
+var townProto = document.getElementById('townProto');
+
+function showTurn(game){
+  var path = new Path.Rectangle(10,10,30,30);
+  path.strokeColor = 'black'
+  path.fillColor = getPlayerColor(game.getTurn());
+}
+
+function getPlayerColor(value){
+  if(value === 1) return "yellow";
+  if(value === 2) return "green";
+}
+
+function VCell(center, radius, coords) {
+    var instance = this
+    this.center = center
+    this.path = new Path.RegularPolygon({
+      center: center,
+      sides: 6,
+      radius: radius,
+      rotation: 30,
+      strokeColor: 'red',
+      fillColor: 'lightgray',
+      strokeWidth: 3
+    })
+//    this.path.vcell = this;
+    this.coords = coords;
+    project.importSVG(castleProto, function(item) {
+      instance.castle = item;
+      instance.castle.position = instance.center + [5,5];
+      instance.castle.scaling = 0.8;
+    });
+    project.importSVG(townProto, function(item) {
+      instance.town = item;
+      instance.town.position = instance.center + [5,5];
+      instance.town.scaling = 1;
+    });
+    this.group = new Group([this.path, instance.castle, instance.town]);
+    this.group.onMouseDown = function(event) {
+        handleTurn(instance.coords)
+    };
+
+    instance.onUpdate = function(cell) {
+      if (cell.condition !== 0) {
+       instance.path.fillColor = getPlayerColor(cell.condition);
+      }
+      if (cell.castle ) {
+        instance.castle.visible = true;
+        instance.castle.fillColor = [undefined, 'red','white'][cell.condition];
+      }
+      if (cell.town) {
+        instance.town.visible = true;
+        instance.town.scaling = 1;
+        instance.town.strokeWidth = 1;
+        instance.town.strokeColor = 'black';
+        instance.town.fillColor = [undefined, 'red','white'][cell.condition];
+      }
+
+    }
+}
+
+
+  // VCell.prototype.onUpdate = function( cell )
+
+  function showCongr(msg){
+    var text = new PointText({
+      point: [400, 30],
+      content: msg,
+      fillColor: "red",
+      fontFamily: 'Lucida Console',
+      fontWeight: 'bold',
+      fontSize: 25
+    });
+  }
+
+  function drawe(radius) {
+
+    var yradius = Math.sin(Math.PI / 3) * radius
+    var fieldStart = [0, 50]
+    for (var i = 0; i < game.rows; i++) {
+      for (var j = 0; j < game.cols; j++) {
+        var cellView ={} ;
+          cellView = new VCell(
+                      new Point(
+                        fieldStart[0] + radius + 1.5 * j * radius
+                        ,  fieldStart[1]  + yradius * (2 * i + 1) + (j % 2) * yradius
+                      ),
+                        radius, {"r": i, "c": j })
+
+        game.cellSubscribe(cellView.onUpdate,i,j)
+        cellView.onUpdate(game.field[i][j])
+      }
+    }
+
+  }
+
+  var hitOptions = {
+    segments: true,
+    stroke: true,
+    fill: true,
+    tolerance: 5
+  }
+
+
+  function handleTurn(coords) {
+    if (game.makeTurn(game.getTurn(), coords.r, coords.c)) {
+     game.flipTurn();
+    }
+    showTurn(game);
+    if(game.isGameOver()){
+      var c1 = game.countOfCells(1);
+      var c2 = game.countOfCells(2);
+      var a = game.getWinner();
+      if(a !== 'draw')
+      showCongr(a + '-й игрок выиграл!!!' + '( ' + c1 + ':' + c2 + ' )' ); else {
+        showCongr('  (:НИЧЬЯ:)');
+      }
+    }
+  }
+
+  function onMouseDownHandler(event) {
+    segment = item = null;
+    var hitResult = project.hitTest(event.point, hitOptions);
+    if (!hitResult) {
+      return;
+    }
+
+    if (hitResult) {
+      item = hitResult.item;
+      game.makeTurn(game.getTurn(), item._parent.vcell.coords.r, item._parent.vcell.coords.c)
+    }
+
+    game.flipTurn()
+    showTurn(game);
+    if(game.isGameOver()){
+      var c1 = game.countOfCells(1);
+      var c2 = game.countOfCells(2);
+      var a = game.getWinner();
+      if(a !== 'draw')
+      showCongr(a + '-й игрок выиграл!!!' + '( ' + c1 + ':' + c2 + ' )' ); else {
+        showCongr('  (:НИЧЬЯ:)');
+      }
+    }
+  }
+
+  function logger(txt) {
+    document.getElementById('log').innerHTML += txt + "<br/>"
+  }
+
+  var game = new GameModel(8, 18)
+
+  game.makearr()
+  game.setInitPos([
+    [6, 1],
+    [1, 16]
+  ])
+
+
+  drawe(30);
+  showTurn(game);
+
+
+  //game.makeTurn(1,3,3)
+
+</script>
+</head>
+<body>
+  <div style="display:block;"><span id="log" style="vertical-align:top"/></div>
+
+	<canvas id="myCanvas" resize="true" height="700" width="1000" contenteditable="true"></canvas>
+  <svg style="display:none;" id="castleProto" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
+	 width="50px" height="50px" viewBox="0 0 800 800" xml:space="preserve">
+<path d="M480,16v32h-32V16h-32v32h-32V16h-32v32v64l32,32v128h-32v-32h-64v32h-64v-32h-64v32h-32V144l32-32V48V16h-32v32H96V16H64
+	v32H32V16H0v32v64l32,32v128v224h160v-64c0-35.375,28.656-64,64-64s64,28.625,64,64v64h160V272V144l32-32V48V16H480z M64,272v-48
+	c0-8.875,7.156-16,16-16s16,7.125,16,16v48H64z M416,272v-48c0-8.875,7.156-16,16-16s16,7.125,16,16v48H416z"/>
+</svg>
+
+<svg style="display:none;" id="townProto" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
+ width="50px" height="50px" viewBox="0 0 800 800" xml:space="preserve">
+<path d="M480,16v32h-32V16h-32v32h-32V16h-32v32v64l32,32v128h-32v-32h-64v32h-64v-32h-64v32h-32V144l32-32V48V16h-32v32H96V16H64
+v32H32V16H0v32v64l32,32v128v224h160v-64c0-35.375,28.656-64,64-64s64,28.625,64,64v64h160V272V144l32-32V48V16H480z"/>
+</svg>
+
+</body>
+</html>

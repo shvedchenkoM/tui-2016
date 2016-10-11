@@ -1,0 +1,37 @@
+.c {
+  border: 1px solid #333; /* Рамка */
+  display: inline-block;
+  padding: 5px 15px; /* Поля */
+  text-decoration: none; /* Убираем подчёркивание */
+  color: #000; /* Цвет текста */
+}
+.c:hover {
+  box-shadow: 0 0 5px rgba(0,0,0,0.3); /* Тень */
+  background: linear-gradient(to bottom, #fcfff4, #e9e9ce); /* Градиент */
+  color: #a00;
+}
+.fig {
+  text-align: center;
+  color: #808080;
+}
+
+.rules {
+  text-align: justify;
+  color: black;
+  width: 600px;
+  font-size: 1.5em;
+  margin: auto;
+  width: 50%;
+}
+
+.banner {
+  text-align: center;
+  color: black;
+  width: 200px;
+  font-size: 1.5em;
+  margin: auto;
+  width: 50%;
+  box-shadow: 0 0 20px rgba(0,0,0,0.5); /* Тень */
+  background: linear-gradient(to bottom, #fcfff4, #e9e9ce); /* Градиент */
+  color: #a00;
+}

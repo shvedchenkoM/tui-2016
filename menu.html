@@ -1,0 +1,28 @@
+<html>
+  <head>
+    <meta charset=utf-8>
+    <title>Sechseck</title>
+    <link rel=stylesheet href="css/style.css" />
+    <script type="text/javascript">
+    "use strict";
+      function showAbout() {
+        document.getElementById('about').style = "";
+      }
+      function hideAbout() {
+        document.getElementById('about').style = "display:none;";
+        return false;
+      }
+
+    </script>
+  </head>
+  <body>
+    <p class=fig><img src=Sechseck3.png width=30%>
+      <div id="about" class="banner" style="display:none">
+        <h2 class="fig">(c) 2016 by kITten</h2>
+        <input type="button" onclick="hideAbout();return false;" value="OK" />
+      </div>
+    <p align=center><a href="game.html" class=c>Новая игра</a>
+    <p align=center><a href="rules.html" class=c>Правила</a>
+    <p align=center><a onclick="showAbout()" class=c>О программе</a>
+  </body>
+</html>

@@ -1,0 +1,31 @@
+<html>
+  <head>
+    <meta charset=utf-8>
+    <title>Sechseck</title>
+    <link rel=stylesheet href="css/style.css" />
+    <script type="text/javascript">
+      function showBanner3() {
+        document.getElementById('mode3').style = "";
+
+      }
+
+      function hide3() {
+        document.getElementById('mode3').style = "display:none;";
+        return false;
+      }
+
+    </script>
+  </head>
+  <body>
+    <p class=fig><img src=Sechseck3.png width=30%>
+    <div id="mode3" class="banner" style="display:none">
+      <h2 class="fig">Coming soon</h2>
+      <input type="button" onclick="hide3();return false;" value="OK" />
+    </div>
+    <h2 class=fig>Выберите режим:</h2>
+    <p align=center><a href="paper_js/sechseck.html" class=c>I'm too young to die!</a>
+    <p align=center><a href="paper_js/sechseckRandM.html" class=c>Hey, not too rough!</a>
+    <p align=center><a href="" onclick="showBanner3();return false;" class=c>Hurt me plenty!</a>
+    <p align=center><a href=menu.html class=c>Назад</a>
+  </body>
+</html>
