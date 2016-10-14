@@ -3,7 +3,9 @@
 <head>
 <meta charset="utf-8" />
 <script type="text/javascript" src="js/paper-full.min.js"></script>
-<script type="text/javascript" src="js/gamemodel3.js"></script>
+<script type="text/javascript" src="js_3/heneral.js"></script>
+<script type="text/javascript" src="js_3/cell.js"></script>
+<script type="text/javascript" src="js_3/gamemodel3.js"></script>
 <div id="gameParam">
 <p><strong>Введите размеры поля:</strong></p>
    <p>Кол-во колонок : <input type="number" min="4" max="40" value="8" id="col"/></p>
@@ -17,6 +19,8 @@
         <p>Имя второго : <input type="text" value="player2" id="name2"/></p>
         <p style="text-align: left" ><button id="startButton">Начать игру</button>
 </div>
+<button id="castleButton">Make Castle</button>
+<button id="finishTurnButton" disabled>Finish Turn</button>
 <script type="text/paperscript" canvas="myCanvas">
 
 var castleProto = document.getElementById('castleProto');
@@ -31,6 +35,9 @@ var startButton = document.getElementById('startButton');
 var gameParam = document.getElementById('gameParam');
 var name1 = document.getElementById('name1');
 var name2 = document.getElementById('name2');
+var castleButton = document.getElementById('castleButton');
+var finishTurnButton = document.getElementById('finishTurnButton');
+
 
 function showTurn(game){
   var path = new Path.Rectangle(10,10,30,30);
@@ -39,8 +46,7 @@ function showTurn(game){
 }
 
 function getPlayerColor(value){
-  if(value === 1) return "yellow";
-  if(value === 2) return "green";
+  return ['lightgray','yellow','green'][value];
 }
 
 function VCell(center, radius, coords) {
@@ -80,13 +86,16 @@ function VCell(center, radius, coords) {
 
     this.group = new Group([this.path, instance.castle, instance.town, instance.rock, instance.river]);
     this.group.onMouseDown = function(event) {
-        handleTurn(instance.coords)
+        handleCellClick(instance.coords)
     };
 
     instance.onUpdate = function(cell) {
-      if (cell.getPlayer() !== 0) {
-       instance.path.fillColor = getPlayerColor(cell.getPlayer());
+     instance.path.fillColor = getPlayerColor(cell.getPlayer());
+
+      if ( cell.getHeneral() !== undefined ) {
+        instance.path.fillColor = 'blue'
       }
+
       if (cell.isCastle() ) {
         instance.castle.visible = true;
         instance.castle.fillColor = [undefined, 'red','white'][cell.getPlayer()];
@@ -156,10 +165,16 @@ function VCell(center, radius, coords) {
   }
 
 
-  function handleTurn(coords) {
-    if (game.makeTurn(game.getTurn(), coords.r, coords.c)) {
-     game.flipTurn();
-    }
+  function handleCellClick(coords) {
+    game.doCommand({
+      code: 0,
+      params: coords
+    })
+
+    // if (game.makeTurn( cell.coords.r, cell.coords.c)) {
+    //  game.flipTurn();
+    // }
+
     showTurn(game);
     if(game.isGameOver()){
       var c1 = game.countOfCells(1);
@@ -188,14 +203,39 @@ function VCell(center, radius, coords) {
     var x = row.value;
     var y = col.value;
     game = new GameModel(x, y, steps);
+    game.subscribe('generic',showGameState)
+    game.subscribe('finishTurn', function() {
+      finishTurnButton.disabled = false
+    })
+
+    game.subscribe('startTurn', function() {
+      finishTurnButton.disabled = true
+    })
+
     game.makearr()
     game.setInitPos([
-      [x-2, 1],
-      [1, y-2]
+      {r: x-2,c: 1},
+      {r: 1, c: y-2}
     ])
     drawe(30);
     showTurn(game);
+    game.beginNewTurn();
   }
+
+  function showGameState(game) {
+    if (game.activeHeneral !== undefined)
+      console.log(game.activeHeneral.moves + ' hodov zalyshylos') ;
+  }
+
+  castleButton.addEventListener('click', function() {
+    game.doCommand({code:2});
+  })
+
+  finishTurnButton.addEventListener('click', function() {
+    game.doCommand({code:1});
+  })
+
+//////////////////////////////////////////////////////////////////////////////////
 
   startButton.addEventListener('click', startGame );
   step2Button.addEventListener('click', showNamesPanel )
