@@ -1,9 +1,49 @@
-function Cell(row, col) {
+function Heneral(cell, number, player){
+  this.number = number
+  this.player = player
+  this.cell = cell
+  this.moves = 2
+  this.active = false
+}
+Heneral.prototype.setCell = function(cell){
+  this.cell = cell
+}
+
+Heneral.prototype.getCell = function(){
+  return this.cell
+}
+
+Heneral.prototype.setActive = function(flag){
+  this.active = flag
+}
+
+Heneral.prototype.getActive = function(){
+  return this.active
+}
+
+Heneral.prototype.resetMoves = function() {
+  this.moves = 2
+  this.setActive(false)
+}
+
+Heneral.prototype.makeMove = function(cell) {
+  if (this.moves > 0) {
+    this.moves--
+    this.setCell(cell)
+  }
+}
+
+
+function Cell(row, col, field) {
   this.row = row
   this.col = col
   this.player = 0
   this.type = 0
   this.subscribers = []
+  this.field = field
+}
+Cell.prototype.setHeneral = function(){
+
 }
 Cell.prototype.setPlayer = function (player) {
     this.player = player
@@ -62,6 +102,9 @@ Cell.prototype.toString = function() {
   return "[" + this.row + "][" + this.col + "]:" + this.color
 }
 
+Cell.prototype.hasHeneral = function() {
+  return this.field.isCellHasGeneral(this)
+}
 
 
 function GameModel(n, m, maxSteps) {
@@ -72,6 +115,7 @@ function GameModel(n, m, maxSteps) {
   this.colors = ['green', 'red']
   this.initPos = []
   this.flag = 0;
+  this.generales =[[],[]]
 
   this.ngetfuncs = [
     function(i, j) {
@@ -130,7 +174,7 @@ GameModel.prototype.makearr = function() {
   for (var i = 0; i < this.rows; i++) {
     for (var j = 0; j < this.cols; j++) {
       if (!arr[i]) { arr[i] = [];}
-      arr[i][j] = new Cell(i, j);
+      arr[i][j] = new Cell(i, j, this);
       var prob = Math.random()*10;
       if ( prob < 3 ) {
         if (prob > 1) {

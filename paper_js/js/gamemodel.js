@@ -43,13 +43,14 @@ Cell.prototype.toString = function() {
 
 
 
-function GameModel(n, m, initPos) {
+function GameModel(n, m, maxSteps) {
   this.turn = 1
   this.rows = n
   this.cols = m
   this.field = []
   this.colors = ['green', 'red']
-  this.initPos = initPos
+  this.initPos = []
+  this.flag = 0;
 
   this.ngetfuncs = [
     function(i, j) {
@@ -163,9 +164,9 @@ GameModel.prototype.isTurnExpanding = function(player, r, c){
   if (this.field[r][c].town) return false;
   if (this.field[r][c].condition === player) {
       for(var i = 0; i<6; i++){
-        var k = this.getNeighbor(r, c, i);
-        if (k === undefined) continue;
-        if (k.condition !== player) return true;
+         var k = this.getNeighbor(r, c, i);
+         if (k === undefined) continue;
+         if (k.condition !== player /*&& !k.isTown*/) return true;
       }
   } else return this.isTurnValid(player, r, c);
 }
@@ -193,7 +194,12 @@ GameModel.prototype.getWinner = function(){
 
 }
 
+
+
+
 GameModel.prototype.isGameOver = function(){
+  console.log(this.flag);
+  if (this.flag >= step.value * 2) {return true}
   var r=0;
   for(i=0; i<this.rows; i++){
     for(j=0; j<this.cols; j++){
@@ -232,6 +238,7 @@ GameModel.prototype.setInitPos = function(initPos) {
 GameModel.prototype.makeTurn = function(player, r, c) {
   if (this.isTurnValid(player, r, c)) {
     this.takeCell(player, r, c)
+    this.flag++;
     return true
   }
   return false

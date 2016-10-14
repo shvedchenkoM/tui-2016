@@ -6,8 +6,9 @@
 <script type="text/javascript" src="js/gamemodel.js"></script>
 <div id="gameParam">
 <p><strong>Введите размеры поля:</strong></p>
-   <p>Columns : <input type="number" min="4" max="40" value="5" id="col"/></p>
-   <p>Rows : <input type="number" min="4" max="40" value="5" id="row"/></p>
+   <p>Кол-во столбцов : <input type="number" min="5" max="40" value="8" id="col"/></p>
+   <p>Кол-во строчек : <input type="number" min="5" max="40" value="6" id="row"/></p>
+   <p>Кол-во ходов : <input type="text" value="2" size="4" id="step"/><p>
    <p style="text-align: left" ><button id="step2Button">Продолжить</button>
 </div>
 <div id="playersName" style="display: none;">
@@ -28,6 +29,7 @@ var startButton = document.getElementById('startButton');
 var gameParam = document.getElementById('gameParam');
 var name1 = document.getElementById('name1');
 var name2 = document.getElementById('name2');
+
 
 function showTurn(game){
   var path = new Path.Rectangle(10,10,30,30);
@@ -89,7 +91,6 @@ function VCell(center, radius, coords) {
 }
 
 
-  // VCell.prototype.onUpdate = function( cell )
 
   function showCongr(msg){
     var text = new PointText({
@@ -157,13 +158,14 @@ function VCell(center, radius, coords) {
   }
 
   var game;
+  var steps = step.value;
 
   function startGame(){
     clearView();
     hideNamesPanel();
     var x = row.value;
     var y = col.value;
-    game = new GameModel(x, y);
+    game = new GameModel(x, y, steps);
     game.makearr()
     game.setInitPos([
       [x-2, 1],
@@ -174,7 +176,7 @@ function VCell(center, radius, coords) {
   }
 
   startButton.addEventListener('click', startGame );
-  step2Button.addEventListener('click', showNamesPanel )
+  step2Button.addEventListener('click', showNamesPanel)
   function clearView() {
     project.activeLayer.removeChildren();
     view.draw();
@@ -187,6 +189,10 @@ function VCell(center, radius, coords) {
     hideNamesPanel();
   }
   function showNamesPanel() {
+    if(col.value < 5 || col.value > 21 || row.value < 5 || row.value > 21) {
+      alert('NO');
+      return;
+    }
     hideGameParam();
     playersName.style = "";
   }
@@ -199,7 +205,7 @@ function VCell(center, radius, coords) {
 <body>
   <div style="display:block;"><span id="log" style="vertical-align:top"/></div>
 
-	<canvas id="myCanvas" resize="true" height="700" width="1000" contenteditable="true"></canvas>
+	<canvas id="myCanvas" resize="true" height="2000" width="2000" contenteditable="true"></canvas>
   <svg style="display:none;" id="castleProto" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
 	 width="50px" height="50px" viewBox="0 0 800 800" xml:space="preserve">
 <path d="M480,16v32h-32V16h-32v32h-32V16h-32v32v64l32,32v128h-32v-32h-64v32h-64v-32h-64v32h-32V144l32-32V48V16h-32v32H96V16H64
@@ -215,4 +221,3 @@ v32H32V16H0v32v64l32,32v128v224h160v-64c0-35.375,28.656-64,64-64s64,28.625,64,64
 
 </body>
 </html>
-
