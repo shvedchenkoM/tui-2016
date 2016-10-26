@@ -199,6 +199,7 @@ GameModel.prototype.getArmy = function(player) {
   return this.twoArmies[player - 1];
 }
 
+//changed logic for get
 GameModel.prototype.getWinner = function(){
   var c1 = this.countOfCells(1);
   var c2 = this.countOfCells(2);
