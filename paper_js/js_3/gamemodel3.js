@@ -1,4 +1,3 @@
-
 function GameModel(n, m, maxSteps) {
   this.turn = 1
   this.rows = n
@@ -7,13 +6,15 @@ function GameModel(n, m, maxSteps) {
   this.colors = ['green', 'red']
   this.initPos = []
   this.flag = 0;
+  this.maxSteps = maxSteps;
   this.twoArmies =[[],[]]
   this.subscribers = {
     generic:[],
     finishTurn: [],
     startTurn: [],
     finishGame: [],
-    heneralActivated: []
+    heneralActivated: [],
+    errors: [],
   }
   this.ngetfuncs = [
     function(i, j) {
@@ -81,14 +82,15 @@ GameModel.prototype.getTurn = function() {
   return this.turn
 }
 
-GameModel.prototype.getPlIx = function() {
+//666
+GameModel.prototype.getPlayerIndex = function() {
   return this.turn - 1
 }
 
 GameModel.prototype.beginNewTurn = function() {
   //1. new General in town for current player
   this.createNewHeneral()
-  this.twoArmies[this.getPlIx()].forEach( (i) => i.resetMoves() )
+  this.twoArmies[this.getPlayerIndex()].forEach( (i) => i.resetMoves() )
 }
 
 GameModel.prototype.createNewHeneral = function() {
@@ -123,6 +125,7 @@ GameModel.prototype.makearr = function() {
      })
   })
 }
+
 
 GameModel.prototype.cellSubscribe = function(subscriber, r, c) {
   this.field[r][c].subscribe(subscriber)
@@ -179,25 +182,37 @@ GameModel.prototype.countOfCells = function(color){
       if(this.field[i][j].getPlayer() === color){
         r++;
       }
+      // if( this.field[i][j].isNoones()
+      //     && this.field[i][j].getHeneral() !== undefined
+      //     && this.field[i][j].getHeneral().player === color ){
+      //   r++;
+      // }
     }
   }
+
+  r += this.getArmy(color).filter( (x) => { return x.getCell().isNoones(); } ).length;
  return r;
 }
 
-GameModel.prototype.getWinner = function(){
-  var r=0;
-  for(i=0; i<this.rows; i++){
-    for(j=0; j<this.cols; j++){
-       r+=[0,1,-1][this.field[i][j].getPlayer()];
-      }
-    }
-    if(r>0) return 1; else if(r<0) return 2; else return "draw";
+GameModel.prototype.getArmy = function(player) {
+  // if (player < 1 || player > 2 ) throw new Error('Impossible')
+  return this.twoArmies[player - 1];
+}
 
+GameModel.prototype.getWinner = function(){
+  var c1 = this.countOfCells(1);
+  var c2 = this.countOfCells(2);
+  return {
+    c1: c1,
+    c2: c2,
+    winner: ( c1 === c2 ?0: (c1>c2?1:2) )
+  }
 }
 
 
 GameModel.prototype.isGameOver = function(){
-  if (this.flag >= step.value * 2) {return true}
+  console.log(this.maxSteps);
+  if (this.flag >= this.maxSteps * 2) {return true}
   var r=0;
   for(i=0; i<this.rows; i++){
     for(j=0; j<this.cols; j++){
@@ -206,7 +221,6 @@ GameModel.prototype.isGameOver = function(){
       }
     }
   }
-
 
  return true;
 }
@@ -227,6 +241,7 @@ GameModel.prototype.setTown = function(player,r,c) {
   this.field[r][c].setTown()
 }
 
+//666
 GameModel.prototype.setInitPos = function(initPos) {
   this.initPos = initPos;
   this.setTown(2, this.initPos[1].r, this.initPos[1].c)
@@ -239,10 +254,9 @@ GameModel.prototype.getCell = function(cs) {
   return this.field[cs.r][cs.c]
 }
 
-GameModel.prototype.makeTurn = function( r, c) {
+GameModel.prototype.makeTurn = function(r, c) {
   if (this.isTurnValid(this.getTurn(), r, c)) {
     this.takeCell(this.getTurn(), r, c)
-    this.flag++;
     return true
   }
   return false
@@ -255,82 +269,125 @@ GameModel.prototype.makeTurn = function( r, c) {
 // - 2 to build Castle
 // -
 // params: any params required (optional)
+//666
 GameModel.prototype.doCommand = function(event) {
-  if (event.code === 0) {
-    this.selectHeneral(event.params)
-  }
-
   if (event.code === 1) {
-    this.flipTurn()
+    this.flipTurn();
+  } else {
+    if(this.isTurnComplited()){
+      return undefined;
+    }
+    if (event.code === 0) {
+      this.cellActionRouter(event.params);
+    }
+    if (event.code === 2) {
+      this.buildCastle();
+    }
+    this.checkAndNotifyTurnCompleted();
+    this.notify('generic');
   }
-
-  if (event.code === 2) {
-    this.buildCastle()
-  }
-  this.checkAndNotifyTurnCompleted();
-  this.notify('generic')
 }
-
-GameModel.prototype.selectHeneral = function(cellCoords) {
+//666
+GameModel.prototype.cellActionRouter = function(cellCoords) {
   var cell = this.getCell(cellCoords)
   var heneral = this.cellGeneral(cell)
   if (heneral !== undefined && heneral.getPlayer() === this.getTurn()) {
-    this.setActiveHeneral( heneral )
-    heneral.setActive(true)
-    heneral.getCell().notify()
-  } else if (this.activeHeneral !== undefined) {
-    this.moveHeneralToCell(cell)
+      this.selectHeneral(heneral);
+  }  else if (this.activeHeneral !== undefined) {
+    this.moveHeneralToCell(cell, this.activeHeneral)
   }
 }
 
-GameModel.prototype.moveHeneralToCell = function( toCell) {
+GameModel.prototype.selectHeneral = function(heneral) {
+    this.setActiveHeneral(heneral);
+    heneral.setActive(true);
+    heneral.getCell().notify();
+}
+
+GameModel.prototype.moveHeneralToCell = function(toCell, heneral) {
   if (this.activeHeneral.moves > 0) {
-    var oldCell = this.activeHeneral.getCell()
-    this.activeHeneral.makeMove(toCell)
-    oldCell.notify()
-    toCell.notify()
-    if (this.activeHeneral.moves === 0) {
-      this.activeHeneral = undefined
+    if(this.canHeneralMoveHere(toCell, heneral)){
+        var oldCell = this.activeHeneral.getCell()
+        this.activeHeneral.makeMove(toCell)
+        oldCell.notify()
+        toCell.notify()
+        if (this.activeHeneral.moves === 0) {
+          this.activeHeneral = undefined
+        }
     }
   }
 }
 
-GameModel.prototype.checkAndNotifyTurnCompleted = function () {
-  if (this.twoArmies[this.getPlIx()].every((x) => x.isFinished())) {
-    this.notify('finishTurn')
+
+GameModel.prototype.canHeneralMoveHere = function(cell, heneral) {
+  if(cell.getHeneral() !== undefined) return false;
+  if(cell.isRocks()) return false;
+  if(cell.isTown() && heneral.moves !== 2) return false;
+  if(this.isCellNextToCell(cell, heneral.getCell())) return true;
+}
+
+GameModel.prototype.isCellNextToCell = function(cell1, cell2){
+  var result = false;
+  for (var i = 0; i < 6; i++) {
+    var k = this.getNeighbor(cell1.row, cell1.col, i)
+    if (k === undefined) continue;
+    if (k === cell2) {
+      result = true
+      break
+    }
   }
+  return result
+}
+
+//666
+GameModel.prototype.removeHeneral = function(heneral) {
+  var army = this.twoArmies[this.getPlayerIndex()]
+  army.splice(army.indexOf(heneral), 1)
+}
+
+//666
+GameModel.prototype.checkAndNotifyTurnCompleted = function () {
+  if (this.isTurnComplited()) {
+    this.notify('finishTurn')
+    this.flag++;
+  }
+}
+
+GameModel.prototype.isTurnComplited = function() {
+  return this.twoArmies[this.getPlayerIndex()].every((x) => x.isFinished());
 }
 
 GameModel.prototype.buildCastle = function() {
   if (this.activeHeneral !== undefined) {
-    this.activeHeneral.moves = 0
     var cell = this.activeHeneral.getCell()
-    this.removeHeneral(this.activeHeneral)
-    this.activeHeneral = undefined
-    this.takeCell(this.getTurn(), cell.row, cell.col)
-    cell.notify()
-    console.log("Super castel build")
+    if(cell.canCastleBuild()){
+      this.takeCell(this.getTurn(), cell.row, cell.col)
+      this.activeHeneral.moves = 0
+      this.removeHeneral(this.activeHeneral)
+      this.activeHeneral = undefined
+      cell.notify()
+      console.log("Super castel build")
+   } else {
+     this.notify('errors', "Can not build Castle here ")
+   }
   }
 }
 
-GameModel.prototype.removeHeneral = function(heneral) {
-  var army = this.twoArmies[this.getPlIx()]
-  army.splice(army.indexOf(heneral), 1)
-}
-
-GameModel.prototype.subscribe = function (event, subscriber) {
-  var subs = this.subscribers[event]
+//666
+GameModel.prototype.subscribe = function (eventType, subscriber) {
+  var subs = this.subscribers[eventType]
   if (subs !== undefined) {
     subs.push(subscriber)
   }
 }
 
-GameModel.prototype.notify = function(event) {
-    cl = this
-    var subs = this.subscribers[event]
-    if (subs !== undefined) {
-      subs.forEach(function(entry) {
-         entry(cl)
-      })
-    }
+//666
+GameModel.prototype.notify = function(eventType, payload) {
+  if (payload === undefined) payload = this
+  var subs = this.subscribers[eventType]
+  if (subs !== undefined) {
+    subs.forEach(function(entry) {
+       entry(payload)
+    })
   }
+}
