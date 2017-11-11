@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <link rel=stylesheet href="css/style.css" />
+<div id="Consistently">
+<p><strong>Последовательное соединение:</strong></p>
+   <p>Значение сопротивлений: <input type="text" value="" id="con"/></p>
+   <p style="text-align: left" ><button id="count1">Посчитать</button>
+   <span id="callCon"> </span>
+</div>
+<div id="Parallel">
+<p><strong>Параллельное соединение:</strong></p>
+   <p>Значение сопротивлений: <input type="text" value="" id="par"/></p>
+   <p style="text-align: left" ><button id="count2">Посчитать</button>
+<span id="callPar"> </span>
+</div>
+<script>
+let consistently = document.getElementById('con').value;
+let parallel = document.getElementById('par').value;
+let count1 = document.getElementById('count1');
+let count2 = document.getElementById('count2');
+let callCon = document.getElementById('callCon');
+let callPar = document.getElementById('callPar');
+
+function calcForConsistently(event){
+let arr = consistently.split(',');
+console.log(document.getElementById('con'));
+    let s = arr.reduce((acc, item) => acc+(+item), 0);
+return s;
+}
+
+function calcForParallel(event){
+let arr = parallel.split(','); 
+   let s = arr.reduce((acc, item) => acc+(1/item), 0); 
+return 1/s;
+}
+
+count1.addEventListener('click', (event) => callCon.innerText = calcForConsistently());
+count2.addEventListener('click', (event) => callPar.innerText = calcForParallel());
+
+
+</script>
+</head>
+<body class=l1>
+        <p align=center><a href="index.html" class=c>Назад</a>
+</body>
+</html>

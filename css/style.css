@@ -1,18 +1,114 @@
 .c {
-  border: 1px solid #333; /* Рамка */
+  margin-top: 50; 
+  margin-right: 985; 
+  position: relative;
   display: inline-block;
-  padding: 5px 15px; /* Поля */
   text-decoration: none; /* Убираем подчёркивание */
-  color: #000; /* Цвет текста */
+  font-family:arial;
+  border-radius: 12px;
+  font-size: 1.6em;
+  color: #7955c0; /* Цвет текста */
 }
+
 .c:hover {
-  box-shadow: 0 0 5px rgba(0,0,0,0.3); /* Тень */
-  background: linear-gradient(to bottom, #fcfff4, #e9e9ce); /* Градиент */
+  box-shadow:  0 0 5px rgba(255, 255, 255, 0.801);/* Тень */
+  background: linear-gradient(to bottom, #fcfff400, #e2e2db); /* Градиент */
+  color: rgb(189, 189, 189);
+}
+
+.c1 {
+  border: 1px solid #333; /* Рамка */
+  margin-right: 1000;
+  margin-top: 400;
+  display: inline-block;
+  border-radius: 20px;
+  font-size: 2em;
+  font-family:arial;
+  padding: 25px 45px; /* Поля */
+  text-decoration: none; /* Убираем подчёркивание */
+  color: rgba(213, 227, 233, 0.836); /* Цвет текста */
+}
+.c1:hover {
+  box-shadow: 0 0 5px rgba(255, 255, 255, 0.801); /* Тень */
+  background: linear-gradient(to bottom, #fcfff4, #e9e9ceec); /* Градиент */
   color: #a00;
 }
+
+.c2 {
+  border: 1px solid #333; /* Рамка */
+  margin-right: 985;
+  margin-top: 300;
+  display: inline-block;
+  border-radius: 20px;
+  font-size: 2em;
+  font-family:arial;
+  padding: 25px 45px; /* Поля */
+  text-decoration: none; /* Убираем подчёркивание */
+  color:  #7955c0;/* Цвет текста */
+}
+.c2:hover {
+  box-shadow: 0 0 5px rgba(255, 255, 255, 0.801); /* Тень */
+  background: linear-gradient(to bottom, #fcfff4, #e9e9ceec); /* Градиент */
+  color: rgba(213, 227, 233, 0.836);
+}
+
+.c3 {
+  border: 1px solid #333; /* Рамка */
+  margin-right: 985;
+  margin-top: 50;
+  display: inline-block;
+  border-radius: 20px;
+  font-size: 2em;
+  font-family:arial;
+  padding: 25px 45px; /* Поля */
+  text-decoration: none; /* Убираем подчёркивание */
+  color:  #7955c0;/* Цвет текста */
+}
+.c3:hover {
+  box-shadow: 0 0 5px rgba(255, 255, 255, 0.801); /* Тень */
+  background: linear-gradient(to bottom, #fcfff4, #e9e9ceec); /* Градиент */
+  color: rgba(213, 227, 233, 0.836);
+}
+
+.c4 {
+  border: 1px solid #333; /* Рамка */
+  margin-top: 50;
+  display: inline-block;
+  border-radius: 20px;
+  font-size: 2em;
+  font-family:arial;
+  padding: 25px 45px; /* Поля */
+  text-decoration: none; /* Убираем подчёркивание */
+  color:  #7955c0;/* Цвет текста */
+}
+.c4:hover {
+  box-shadow: 0 0 5px rgb(182, 108, 211); /* Тень */
+  background: linear-gradient(to bottom, #fcfff4, #e9e9ceec); /* Градиент */
+  color: rgba(213, 227, 233, 0.836);
+}
+
+.c5 {
+  border: 1px solid rgb(7, 85, 253); /* Рамка */
+  margin-right: 985;
+  margin-top: 10;
+  display: inline-block;
+  border-radius: 10px;
+  font-size: 1.5em;
+  font-family:arial;
+  padding: 10px 25px; /* Поля */
+  text-decoration: none; /* Убираем подчёркивание */
+  color:  #722ff7;/* Цвет текста */
+}
+.c5:hover {
+  box-shadow: 0 0 5px rgb(255, 238, 0); /* Тень */
+  background: linear-gradient(to bottom, #fcfff400, #e9e9ce00); /* Градиент */
+  color: rgb(233, 140, 87);
+}
+
+
 .fig {
   text-align: center;
-  color: #808080;
+  color: #3e256d;
 }
 
 .rules {
@@ -25,13 +121,26 @@
 }
 
 .banner {
-  text-align: center;
+  text-align: left;
   color: black;
   width: 200px;
   font-size: 1.5em;
+  border-radius: 12px;
   margin: auto;
   width: 50%;
-  box-shadow: 0 0 20px rgba(0,0,0,0.5); /* Тень */
+  box-shadow: 0 0 20px rgba(214, 70, 70, 0.5); /* Тень */
   background: linear-gradient(to bottom, #fcfff4, #e9e9ce); /* Градиент */
   color: #a00;
+}
+
+.l1 {
+  margin: 0; 
+  background: url(/home/maria/Desktop/tyi/electricalCircuits/img/cmd3.jpg); 
+  background-size: cover;
+}
+
+.l2 {
+  margin: 0; 
+  background: url(/home/maria/Desktop/tyi/electricalCircuits/img/bg2.jpg); 
+  background-size: cover;
 }
